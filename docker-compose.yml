@@ -4,10 +4,6 @@ networks:
   monitor-net:
     driver: bridge
 
-volumes:
-    prometheus_data: {}
-    grafana_data: {}
-
 services:
 
   prometheus:
@@ -15,7 +11,7 @@ services:
     container_name: prometheus
     volumes:
       - ./prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
+      - ./data/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -47,48 +43,48 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-  nodeexporter:
-    image: prom/node-exporter:v1.0.1
-    container_name: nodeexporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-    restart: unless-stopped
-    expose:
-      - 9100
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.38.4
-    container_name: cadvisor
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-    restart: unless-stopped
-    expose:
-      - 8080
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+      #  nodeexporter:
+      #    image: prom/node-exporter:v1.0.1
+      #    container_name: nodeexporter
+      #    volumes:
+      #      - /proc:/host/proc:ro
+      #      - /sys:/host/sys:ro
+      #      - /:/rootfs:ro
+      #    command:
+      #      - '--path.procfs=/host/proc'
+      #      - '--path.rootfs=/rootfs'
+      #      - '--path.sysfs=/host/sys'
+      #      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      #    restart: unless-stopped
+      #    expose:
+      #      - 9100
+      #    networks:
+      #      - monitor-net
+      #    labels:
+      #      org.label-schema.group: "monitoring"
+      #
+      #  cadvisor:
+      #    image: gcr.io/cadvisor/cadvisor:v0.38.4
+      #    container_name: cadvisor
+      #    volumes:
+      #      - /:/rootfs:ro
+      #      - /var/run:/var/run:rw
+      #      - /sys:/sys:ro
+      #      - /var/lib/docker:/var/lib/docker:ro
+      #      #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+      #    restart: unless-stopped
+      #    expose:
+      #      - 8080
+      #    networks:
+      #      - monitor-net
+      #    labels:
+      #      org.label-schema.group: "monitoring"
 
   grafana:
     image: grafana/grafana:7.3.4
     container_name: grafana
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ./data/grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
@@ -102,16 +98,16 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-  pushgateway:
-    image: prom/pushgateway:v1.3.0
-    container_name: pushgateway
-    restart: unless-stopped
-    expose:
-      - 9091
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+      #  pushgateway:
+      #    image: prom/pushgateway:v1.3.0
+      #    container_name: pushgateway
+      #    restart: unless-stopped
+      #    expose:
+      #      - 9091
+      #    networks:
+      #      - monitor-net
+      #    labels:
+      #      org.label-schema.group: "monitoring"
 
   caddy:
     image: stefanprodan/caddy
