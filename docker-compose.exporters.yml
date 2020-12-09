@@ -22,6 +22,10 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.38.4
     container_name: cadvisor
+    command:
+      - '-port=9338'
+      - '--disable_metrics=network,udp,percpu,sched,process'
+      - '--docker_only'
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -32,5 +36,3 @@ services:
     network_mode: host
     labels:
       org.label-schema.group: "monitoring"
-  
-
